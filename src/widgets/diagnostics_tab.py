@@ -26,8 +26,8 @@ class DiagnosticsWorker(QThread):
         else:
             self.progress.emit("    <font color='orange'>ВНИМАНИЕ:</font> Приложение запущено без прав администратора. Некоторые проверки могут быть недоступны.")
 
-        # 2. Проверка статуса служб
-        self.progress.emit("\n[2/4] Проверка статуса служб...")
+        # 2. Проверка статуса служб и процесса
+        self.progress.emit("\n[2/4] Проверка статуса служб и процесса...")
         zapret_status = self.service_manager.get_service_status()
         if zapret_status == 'RUNNING':
             self.progress.emit("    <font color='green'>OK:</font> Служба 'zapret' запущена.")
@@ -43,6 +43,12 @@ class DiagnosticsWorker(QThread):
             self.progress.emit("    <font color='green'>OK:</font> Служба 'WinDivert' запущена.")
         else:
             self.progress.emit("    <font color='orange'>ВНИМАНИЕ:</font> Служба 'WinDivert' не найдена или не запущена.")
+
+        # Проверка процесса winws.exe
+        if self.is_process_running("winws.exe"):
+            self.progress.emit("    <font color='green'>OK:</font> Процесс 'winws.exe' активен.")
+        else:
+            self.progress.emit("    <font color='red'>ОШИБКА:</font> Процесс 'winws.exe' не найден в диспетчере задач.")
 
         # 3. Проверка сетевых портов
         self.progress.emit("\n[3/4] Проверка сетевых портов...")
@@ -62,6 +68,30 @@ class DiagnosticsWorker(QThread):
 
         self.progress.emit("\n--- Диагностика завершена ---")
         self.finished.emit()
+
+    def is_process_running(self, process_name: str) -> bool:
+        """Проверяет, запущен ли процесс с заданным именем."""
+        try:
+            # Используем tasklist, как в оригинальном скрипте
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = subprocess.SW_HIDE
+
+            process = subprocess.Popen(
+                ['tasklist', '/FI', f'IMAGENAME eq {process_name}'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                stdin=subprocess.PIPE,
+                startupinfo=startupinfo,
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
+            stdout, stderr = process.communicate()
+            return process_name.lower() in stdout.decode('utf-8', errors='ignore').lower()
+        except FileNotFoundError:
+            # Если tasklist не найден, можно попробовать psutil, если он есть
+            # Для соответствия service.bat, ограничимся tasklist
+            self.progress.emit("    <font color='orange'>INFO:</font> Команда 'tasklist' не найдена.")
+            return False
 
     def is_port_in_use(self, port: int) -> bool:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

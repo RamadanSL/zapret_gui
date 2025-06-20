@@ -70,20 +70,26 @@ class ServiceManager:
     def install_service(self, bat_file_path):
         """Устанавливает службу, парся аргументы из .bat файла."""
         args = self._parse_bat_file(bat_file_path)
-        if not args:
-            return False, "Failed to parse .bat file."
+        if args is None: # Проверяем на None, т.к. пустая строка аргументов может быть валидной
+            return False, "Failed to parse .bat file or winws.exe not found in it."
             
         # Commands to install the service
         self.uninstall_service() # Ensure it's not installed first
         
+        # Правильное формирование binPath для sc create.
+        # Весь путь + аргументы должны быть одной строкой в кавычках,
+        # а все внутренние кавычки должны быть экранированы.
+        full_bin_path = f'"{self.winsw_path}" {args}'
+        escaped_bin_path = full_bin_path.replace('"', '\\"')
+
         install_cmd = (
-            f'sc create "{self.service_name}" binPath= "{self.winsw_path} {args}" '
+            f'sc create "{self.service_name}" binPath= "{escaped_bin_path}" '
             f'DisplayName= "{self.service_name}" start= auto'
         )
         
         stdout, stderr = self._run_command(install_cmd, as_admin=True)
         if not stdout or "SUCCESS" not in stdout:
-            return False, f"Failed to create service: {stderr}"
+            return False, f"Failed to create service: {stderr or 'Unknown error'}. Command: {install_cmd}"
 
         desc_cmd = f'sc description "{self.service_name}" "Zapret DPI bypass software"'
         self._run_command(desc_cmd, as_admin=True)
@@ -91,12 +97,31 @@ class ServiceManager:
         return self.start_service()
 
     def uninstall_service(self):
-        """Удаляет службу."""
-        self._run_command(f'sc stop "{self.service_name}"', as_admin=True)
-        stdout, stderr = self._run_command(f'sc delete "{self.service_name}"', as_admin=True)
-        if (stdout and "SUCCESS" in stdout) or (stderr and "1060" in stderr): # 1060 means not found, which is ok
-            return True, "Service uninstalled successfully."
-        return False, f"Failed to uninstall service: {stderr}"
+        """
+        Удаляет службу 'zapret', а также связанные службы 'WinDivert'.
+        """
+        services_to_remove = [self.service_name, "WinDivert", "WinDivert14"]
+        all_successful = True
+        error_messages = []
+
+        for service in services_to_remove:
+            # Сначала останавливаем службу
+            self._run_command(f'sc stop "{service}"', as_admin=True)
+            
+            # Затем удаляем
+            stdout, stderr = self._run_command(f'sc delete "{service}"', as_admin=True)
+            
+            # Успехом считаем либо сообщение SUCCESS, либо ошибку 1060 (служба не найдена)
+            if (stdout and "SUCCESS" in stdout) or (stderr and "1060" in stderr):
+                continue
+            else:
+                all_successful = False
+                error_messages.append(f"Failed to uninstall service '{service}': {stderr}")
+        
+        if all_successful:
+            return True, "Все службы (zapret, WinDivert) успешно удалены."
+        else:
+            return False, "\n".join(error_messages)
 
     def start_service(self):
         """Запускает службу."""
@@ -130,8 +155,9 @@ class ServiceManager:
         
     def _parse_bat_file(self, bat_path):
         """
-        Парсит .bat файл, чтобы извлечь аргументы для winws.exe,
+        Парсит .bat файл, чтобы извлечь ЧИСТУЮ строку аргументов для winws.exe,
         в точности повторяя логику из service.bat.
+        Возвращает строку аргументов без экранирования.
         """
         try:
             with open(bat_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -140,74 +166,37 @@ class ServiceManager:
             print(f"Error reading bat file: {e}")
             return None
 
-        capture = False
         raw_args_line = ""
         winsw_executable_name = "winws.exe"
 
-        # Находим строку, содержащую вызов winws.exe
         for line in lines:
-            if winsw_executable_name in line.lower():
-                # Начинаем захват с этой строки
-                capture = True
-                # Отсекаем все до winws.exe включительно
-                raw_args_line = line[line.lower().find(winsw_executable_name) + len(winsw_executable_name):]
+            lower_line = line.lower()
+            if winsw_executable_name in lower_line:
+                raw_args_line = line[lower_line.find(winsw_executable_name) + len(winsw_executable_name):]
                 break
         
-        if not capture:
-            return None
+        if not raw_args_line:
+            return None # winws.exe не найден
 
-        # Очищаем строку от лишних символов в начале и в конце
         raw_args_line = raw_args_line.strip()
+        if not raw_args_line:
+            return "" # winws.exe найден, но аргументов нет
 
-        # Заменяем переменные окружения из .bat на их Python-эквиваленты
-        # %~dp0 -> директория .bat файла
+        # Замена переменных окружения .bat на их Python-эквиваленты
+        base_dir = os.path.dirname(os.path.abspath(self.winsw_path))
         bat_dir = os.path.dirname(os.path.abspath(bat_path))
-        raw_args_line = raw_args_line.replace("%~dp0", f'"{bat_dir}\\"')
+        
+        # Создаем словарь замен
+        replacements = {
+            "%~dp0": f'"{bat_dir}\\"',
+            "%%BIN%%": f'"{base_dir}\\"',
+            "%BIN%": f'"{base_dir}\\"',
+            "%%LISTS%%": f'"{os.path.join(base_dir, "..", "lists")}\\"',
+            "%LISTS%": f'"{os.path.join(base_dir, "..", "lists")}\\"',
+        }
 
-        # %BIN% -> абсолютный путь к директории bin
-        bin_dir = os.path.abspath(self.winsw_dir)
-        raw_args_line = raw_args_line.replace("%%BIN%%", f'"{bin_dir}\\"').replace("%BIN%", f'"{bin_dir}\\"')
-        
-        # %LISTS% -> абсолютный путь к директории lists
-        lists_dir = os.path.abspath(os.path.join(bin_dir, "..", "lists"))
-        raw_args_line = raw_args_line.replace("%%LISTS%%", f'"{lists_dir}\\"').replace("%LISTS%", f'"{lists_dir}\\"')
-        
-        # Заменяем двойные кавычки на одинарные для внутреннего разделения,
-        # чтобы split работал корректно. Используем редкий символ как временный разделитель.
-        # Это упрощенный подход по сравнению с логикой в service.bat, но более надежный в Python.
-        # re.split будет обрабатывать строки в кавычках как единое целое.
-        
-        # Имитация сложного парсинга аргументов из bat файла
-        # Это более простой и надежный способ, чем посимвольный перебор в .bat
-        args = []
-        # Используем regex для разделения по пробелам, но сохраняя строки в кавычках
-        for arg in re.findall(r'(?:[^\s,"]|"(?:\\.|[^"])*")+', raw_args_line):
-            arg = arg.strip()
-            if not arg:
-                continue
-
-            # Убираем лишние кавычки по краям, если они есть
-            if arg.startswith('"') and arg.endswith('"'):
-                arg = arg[1:-1]
+        for var, value in replacements.items():
+            raw_args_line = raw_args_line.replace(var, value)
             
-            # В service.bat есть специальная обработка для @-файлов
-            if arg.startswith('@'):
-                # Заменяем @ на полный путь
-                arg = f'"{os.path.abspath(os.path.join(bat_dir, arg[1:]))}"'
-
-            # В service.bat есть обработка для путей без кавычек
-            # Здесь мы предполагаем, что пути с пробелами уже в кавычках.
-            # Для надежности обернем все, что похоже на путь, но не имеет кавычек
-            elif ("/" in arg or "\\" in arg) and not arg.startswith('"'):
-                 arg = f'"{arg}"'
-
-            args.append(arg)
-
-        final_args = " ".join(args)
-        
-        # В `service.bat` используется сложная замена кавычек для `sc create`.
-        # `binPath` требует экранирования внутренних кавычек с помощью \".
-        # Формируем binPath так, чтобы он был заключен в кавычки, а внутренние были экранированы.
-        final_args = final_args.replace('"', '\\"')
-
-        return final_args 
+        # Просто возвращаем обработанную строку. Экранированием займется install_service.
+        return raw_args_line.strip() 
