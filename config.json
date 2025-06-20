@@ -29,5 +29,23 @@
     },
     "updates": {
         "auto_update": false
+    },
+    "settings": {
+        "general": {
+            "auto_start": false,
+            "minimize_to_tray": true,
+            "check_updates": false,
+            "update_interval": 24,
+            "theme": "Темная",
+            "language": "ru"
+        }
+    },
+    "filter": {
+        "settings": {
+            "https_filter": true,
+            "http_filter": true,
+            "dns_server": "8.8.8.8",
+            "selected_profile": "general (ALT3).bat"
+        }
     }
 }
