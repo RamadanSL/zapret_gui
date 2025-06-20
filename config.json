@@ -1,0 +1,33 @@
+{
+    "general": {
+        "language": "ru",
+        "start_minimized": false,
+        "minimize_to_tray": false,
+        "theme": "Material Dark"
+    },
+    "paths": {
+        "lists_dir": "C:\\Users\\ramza\\Desktop\\zapret-discord-youtube-1.7.2\\lists",
+        "bin_dir": "C:\\Users\\ramza\\Desktop\\zapret-discord-youtube-1.7.2\\bin",
+        "log_dir": "C:\\Users\\ramza\\Desktop\\zapret-discord-youtube-1.7.2\\logs"
+    },
+    "logging": {
+        "enabled": true,
+        "level": "INFO"
+    },
+    "service": {
+        "autostart": false,
+        "name": "ZapretService"
+    },
+    "network": {
+        "default_ping_host": "8.8.8.8",
+        "default_ping_count": 4,
+        "default_ports": "80,443,8080"
+    },
+    "window": {
+        "geometry": "01d9d0cb00030000000001700000004e000004cd000002c3000001700000006c000004cd000002c300000000000000000600000001700000006c000004cd000002c3",
+        "state": "000000ff00000000fd000000000000035e0000025800000004000000040000000800000008fc00000000"
+    },
+    "updates": {
+        "auto_update": false
+    }
+}
