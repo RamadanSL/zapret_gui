@@ -1,0 +1,101 @@
+/* Dark Theme */
+QWidget {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    font-family: "Segoe UI";
+}
+
+QGroupBox {
+    background-color: #34495e;
+    border: 1px solid #2c3e50;
+    border-radius: 5px;
+    margin-top: 1ex;
+    font-weight: bold;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 5px;
+    background-color: #34495e;
+}
+
+QPushButton {
+    background-color: #5d6d7e;
+    border: 1px solid #2c3e50;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+QPushButton:hover {
+    background-color: #718093;
+}
+
+QPushButton:pressed {
+    background-color: #4a5568;
+}
+
+QPushButton:disabled {
+    background-color: #4a5568;
+    color: #888;
+}
+
+QTextEdit, QLineEdit {
+    background-color: #2c3e50;
+    border: 1px solid #4a5568;
+    border-radius: 4px;
+    padding: 5px;
+    color: #ecf0f1;
+}
+
+QCheckBox::indicator {
+    width: 40px;
+    height: 20px;
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(src/resources/toggle_off.svg);
+}
+
+QCheckBox::indicator:checked {
+    image: url(src/resources/toggle_on.svg);
+}
+
+QProgressBar {
+    border: 1px solid #4a5568;
+    border-radius: 4px;
+    text-align: center;
+    color: #ecf0f1;
+}
+
+QProgressBar::chunk {
+    background-color: #3498db;
+    width: 10px;
+    margin: 0.5px;
+}
+
+/* Specific styles for nav bar to override QWidget */
+#NavigationBar {
+    background-color: #34495e;
+}
+#NavigationBar QPushButton {
+    background-color: #34495e;
+    color: white;
+    border: none;
+    padding: 15px;
+    text-align: left;
+    font-size: 14px;
+}
+#NavigationBar QPushButton:hover {
+    background-color: #4e6a85;
+}
+#NavigationBar QPushButton:checked {
+    background-color: #2c3e50;
+    border-left: 3px solid #3498db;
+}
+
+/* Specific styles for header */
+#Header {
+    background-color: #2c3e50; 
+    color: white;
+} 

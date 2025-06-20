@@ -1,7 +1,11 @@
 import sys
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, 
-                               QHBoxLayout, QVBoxLayout, QStackedWidget)
+                               QHBoxLayout, QVBoxLayout, QStackedWidget, QMessageBox)
 from PySide6.QtGui import QIcon
+from PySide6.QtCore import QCoreApplication, Qt
+
+from utils.settings_manager import SettingsManager
+from utils.process_manager import ServiceManager
 
 # Import widgets
 from widgets.header import Header
@@ -18,8 +22,11 @@ from widgets.backup_tab import BackupTab
 from widgets.about_tab import AboutTab
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
+        self.settings_manager = SettingsManager()
+        self.app = app
+
         self.setWindowTitle("Zapret GUI")
         self.setWindowIcon(QIcon("src/resources/icon.ico")) # Assuming icon exists
         self.resize(1280, 800)
@@ -33,6 +40,7 @@ class MainWindow(QMainWindow):
 
         # --- Navigation ---
         self.nav_bar = NavigationBar()
+        self.nav_bar.setObjectName("NavigationBar") # For styling
         main_layout.addWidget(self.nav_bar)
 
         # --- Content Area ---
@@ -42,6 +50,7 @@ class MainWindow(QMainWindow):
         
         # Header
         header = Header()
+        header.setObjectName("Header") # For styling
         content_layout.addWidget(header)
 
         # Pages
@@ -68,7 +77,7 @@ class MainWindow(QMainWindow):
             ("src/resources/stats.svg", "Статистика", StatsTab()),
             ("src/resources/diagnostics.svg", "Диагностика", DiagnosticsTab()),
             ("src/resources/domain.svg", "Проверка доменов", DomainCheckerTab()),
-            ("src/resources/settings.svg", "Настройки", SettingsTab()),
+            ("src/resources/settings.svg", "Настройки", SettingsTab(app=self.app)),
             ("src/resources/backup.svg", "Бэкапы", BackupTab()),
             ("src/resources/about.svg", "О программе", AboutTab())
         ]
@@ -77,9 +86,35 @@ class MainWindow(QMainWindow):
             self.pages.addWidget(widget)
             self.nav_bar.add_item(icon, name, i)
 
+def load_stylesheet():
+    # Загружаем только темную тему
+    path = "src/resources/modern_dark.qss"
+    try:
+        with open(path, "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        print(f"Warning: Main stylesheet not found at {path}")
+        return ""
+
 def main():
+    # --- ПРОВЕРКА ПРАВ АДМИНИСТРАТОРА ---
+    service_manager = ServiceManager()
+    if not service_manager.is_admin():
+        reply = QMessageBox.question(None, 'Требуются права администратора',
+                                     'Для работы с системными службами приложению необходимы права администратора.\n\nПерезапустить приложение с повышенными правами?',
+                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                     QMessageBox.StandardButton.Yes)
+        if reply == QMessageBox.StandardButton.Yes:
+            service_manager.relaunch_as_admin()
+        sys.exit() # Закрываем текущий экземпляр в любом случае
+    # ------------------------------------
+
+    QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
     app = QApplication(sys.argv)
-    window = MainWindow()
+    
+    app.setStyleSheet(load_stylesheet())
+
+    window = MainWindow(app)
     window.show()
     sys.exit(app.exec())
 

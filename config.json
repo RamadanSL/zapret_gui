@@ -36,7 +36,7 @@
             "minimize_to_tray": true,
             "check_updates": false,
             "update_interval": 24,
-            "theme": "Темная",
+            "theme": "\u0422\u0435\u043c\u043d\u0430\u044f",
             "language": "ru"
         }
     },
@@ -47,5 +47,6 @@
             "dns_server": "8.8.8.8",
             "selected_profile": "general (ALT3).bat"
         }
-    }
+    },
+    "theme": "dark"
 }

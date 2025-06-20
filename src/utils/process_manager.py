@@ -9,6 +9,7 @@ class ServiceManager:
         self.service_name = service_name
         self.winsw_path = os.path.abspath(winsw_path)
         self.winsw_dir = os.path.dirname(self.winsw_path)
+        self.manual_process_pid = None
 
     def is_admin(self):
         """Проверяет, запущены ли скрипты с правами администратора."""
@@ -17,15 +18,17 @@ class ServiceManager:
         except:
             return False
 
-    def run_as_admin(self):
-        """Перезапускает приложение с правами администратора."""
+    def relaunch_as_admin(self):
+        """Перезапускает текущий скрипт с правами администратора."""
         if sys.platform == 'win32':
             try:
+                # Используем PowerShell для запроса повышения прав, как в service.bat
                 ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+                return True
             except Exception as e:
                 print(f"Failed to elevate privileges: {e}")
                 return False
-        return True
+        return False
 
     def _run_command(self, command, as_admin=False):
         """Выполняет команду в консоли."""
@@ -200,3 +203,70 @@ class ServiceManager:
             
         # Просто возвращаем обработанную строку. Экранированием займется install_service.
         return raw_args_line.strip() 
+
+    def get_service_start_type(self):
+        """Получает тип запуска службы: 'AUTO', 'DEMAND', 'DISABLED', 'NOT_FOUND'."""
+        stdout, stderr = self._run_command(f'sc qc "{self.service_name}"')
+        if "1060" in stderr or (stdout and "failed" in stdout.lower()):
+            return "NOT_FOUND"
+        if stdout:
+            for line in stdout.splitlines():
+                if "START_TYPE" in line:
+                    if "AUTO_START" in line:
+                        return "AUTO"
+                    elif "DEMAND_START" in line:
+                        return "DEMAND"
+                    elif "DISABLED" in line:
+                        return "DISABLED"
+        return "UNKNOWN"
+
+    def set_service_start_type(self, start_type: str):
+        """Устанавливает тип запуска службы ('auto' или 'demand')."""
+        if start_type not in ["auto", "demand"]:
+            return False, "Invalid start type specified."
+        
+        stdout, stderr = self._run_command(f'sc config "{self.service_name}" start= {start_type}', as_admin=True)
+        if stdout and "SUCCESS" in stdout:
+            return True, f"Тип запуска службы изменен на '{start_type}'."
+        return False, f"Не удалось изменить тип запуска: {stderr}"
+
+    def start_manual_process(self, bat_path):
+        """Запускает .bat файл в новой консоли и сохраняет его PID."""
+        try:
+            # CREATE_NEW_CONSOLE ensures it runs in its own window
+            process = subprocess.Popen(['cmd.exe', '/c', bat_path], creationflags=subprocess.CREATE_NEW_CONSOLE)
+            self.manual_process_pid = process.pid
+            return True, f"Процесс запущен с PID: {self.manual_process_pid}"
+        except Exception as e:
+            return False, f"Не удалось запустить процесс: {e}"
+
+    def stop_manual_process(self):
+        """Останавливает процесс, запущенный вручную."""
+        if not self.manual_process_pid:
+            return False, "Нет информации о запущенном вручную процессе."
+        
+        # /F - force, /T - terminate child processes
+        stdout, stderr = self._run_command(f"taskkill /F /T /PID {self.manual_process_pid}")
+        if stdout and "SUCCESS" in stdout:
+            self.manual_process_pid = None
+            return True, "Процесс успешно остановлен."
+        
+        # Если процесс уже был закрыт вручную
+        if stderr and ("not found" in stderr.lower() or "128" in stderr):
+             self.manual_process_pid = None
+             return True, "Процесс не был найден (возможно, уже закрыт)."
+        
+        return False, f"Не удалось остановить процесс: {stderr}"
+
+    def is_manual_process_running(self):
+        """Проверяет, активен ли еще процесс, запущенный вручную."""
+        if not self.manual_process_pid:
+            return False
+        
+        stdout, _ = self._run_command(f'tasklist /FI "PID eq {self.manual_process_pid}"')
+        if stdout and str(self.manual_process_pid) in stdout:
+            return True
+        else:
+            # Если процесс не найден, сбрасываем PID
+            self.manual_process_pid = None
+            return False 
