@@ -216,7 +216,7 @@ class FilterTab(QWidget):
         """Create Material Design profile selection card"""
         card = QGroupBox("📊 Профиль фильтрации")
         card.setProperty("elevation", "1")
-        card.setStyleSheet(self.get_card_style())
+        card.setStyleSheet(StyleUtils.get_card_style())
         
         layout = QVBoxLayout(card)
         layout.setContentsMargins(24, 24, 24, 24)
@@ -227,10 +227,10 @@ class FilterTab(QWidget):
         profile_layout.setSpacing(16)
         
         profile_label = QLabel("Выберите профиль:")
-        profile_label.setStyleSheet(self.get_label_style())
+        profile_label.setStyleSheet(StyleUtils.get_label_style_material())
         
         self.profile_combo = QComboBox()
-        self.profile_combo.setStyleSheet(self.get_combo_style())
+        self.profile_combo.setStyleSheet(StyleUtils.get_combo_style())
         
         profile_layout.addWidget(profile_label)
         profile_layout.addWidget(self.profile_combo)
@@ -240,7 +240,7 @@ class FilterTab(QWidget):
         
         # Profile description
         self.profile_description = QLabel("Выберите профиль для просмотра описания")
-        self.profile_description.setStyleSheet(self.get_label_style("#666666", "400"))
+        self.profile_description.setStyleSheet(StyleUtils.get_label_style_material(color="#9aa0a6"))
         self.profile_description.setWordWrap(True)
         layout.addWidget(self.profile_description)
         
@@ -251,189 +251,140 @@ class FilterTab(QWidget):
         
     def create_settings_card(self, parent_layout):
         """Create Material Design settings card"""
-        card = QGroupBox("⚙️ Настройки фильтра")
+        card = QGroupBox("⚙️ Настройки фильтрации")
         card.setProperty("elevation", "1")
-        card.setStyleSheet(self.get_card_style())
-        
-        layout = QGridLayout(card)
-        layout.setContentsMargins(24, 24, 24, 24)
-        layout.setSpacing(16)
-        
-        # Settings grid
-        row = 0
-        
-        # Auto-start setting
-        self.auto_start_check = QCheckBox("Автозапуск при старте системы")
-        self.auto_start_check.setStyleSheet("""
-            QCheckBox {
-                color: #1c1b1f;
-                font-size: 14px;
-                spacing: 12px;
-            }
-        """)
-        layout.addWidget(self.auto_start_check, row, 0, 1, 2)
-        row += 1
-        
-        # Minimize to tray setting
-        self.minimize_tray_check = QCheckBox("Сворачивать в трей")
-        self.minimize_tray_check.setStyleSheet("""
-            QCheckBox {
-                color: #1c1b1f;
-                font-size: 14px;
-                spacing: 12px;
-            }
-        """)
-        layout.addWidget(self.minimize_tray_check, row, 0, 1, 2)
-        row += 1
-        
-        # Logging setting
-        self.logging_check = QCheckBox("Включить логирование")
-        self.logging_check.setStyleSheet("""
-            QCheckBox {
-                color: #1c1b1f;
-                font-size: 14px;
-                spacing: 12px;
-            }
-        """)
-        layout.addWidget(self.logging_check, row, 0, 1, 2)
-        row += 1
-        
-        # Log level
-        log_level_label = QLabel("Уровень логирования:")
-        log_level_label.setStyleSheet(self.get_label_style())
-        
-        self.log_level_combo = QComboBox()
-        self.log_level_combo.addItems(["INFO", "DEBUG", "WARNING", "ERROR"])
-        self.log_level_combo.setStyleSheet(self.get_combo_style())
-        
-        layout.addWidget(log_level_label, row, 0)
-        layout.addWidget(self.log_level_combo, row, 1)
-        row += 1
-        
-        parent_layout.addWidget(card)
-        
-    def create_status_card(self, parent_layout):
-        """Create Material Design status card"""
-        card = QGroupBox("📈 Статус фильтра")
-        card.setProperty("elevation", "1")
-        card.setStyleSheet(self.get_card_style())
+        card.setStyleSheet(StyleUtils.get_card_style())
         
         layout = QVBoxLayout(card)
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(16)
         
-        # Status indicators
-        status_grid = QGridLayout()
-        status_grid.setSpacing(16)
+        # Checkboxes
+        self.https_checkbox = QCheckBox("Включить фильтрацию HTTPS")
+        self.https_checkbox.setStyleSheet(StyleUtils.get_checkbox_style())
+        layout.addWidget(self.https_checkbox)
+        
+        self.http_checkbox = QCheckBox("Включить фильтрацию HTTP")
+        self.http_checkbox.setStyleSheet(StyleUtils.get_checkbox_style())
+        layout.addWidget(self.http_checkbox)
+        
+        # DNS settings
+        dns_layout = QHBoxLayout()
+        dns_label = QLabel("DNS сервер:")
+        dns_label.setStyleSheet(StyleUtils.get_label_style_material())
+        
+        self.dns_combo = QComboBox()
+        self.dns_combo.addItems(["8.8.8.8", "1.1.1.1", "77.88.8.8", "Пользовательский"])
+        self.dns_combo.setStyleSheet(StyleUtils.get_combo_style())
+        
+        dns_layout.addWidget(dns_label)
+        dns_layout.addWidget(self.dns_combo)
+        dns_layout.addStretch()
+        
+        layout.addLayout(dns_layout)
+        
+        # Auto-start setting
+        self.auto_start_check = QCheckBox("Автозапуск при старте системы")
+        self.auto_start_check.setStyleSheet(StyleUtils.get_checkbox_style())
+        layout.addWidget(self.auto_start_check)
+
+        # Minimize to tray setting
+        self.minimize_tray_check = QCheckBox("Сворачивать в трей")
+        self.minimize_tray_check.setStyleSheet(StyleUtils.get_checkbox_style())
+        layout.addWidget(self.minimize_tray_check)
+
+        # Logging setting
+        self.logging_check = QCheckBox("Включить логирование")
+        self.logging_check.setStyleSheet(StyleUtils.get_checkbox_style())
+        layout.addWidget(self.logging_check)
+
+        # Log level
+        log_level_layout = QHBoxLayout()
+        log_level_label = QLabel("Уровень логирования:")
+        log_level_label.setStyleSheet(StyleUtils.get_label_style_material())
+        
+        self.log_level_combo = QComboBox()
+        self.log_level_combo.addItems(["INFO", "DEBUG", "WARNING", "ERROR"])
+        self.log_level_combo.setStyleSheet(StyleUtils.get_combo_style())
+
+        log_level_layout.addWidget(log_level_label)
+        log_level_layout.addWidget(self.log_level_combo)
+        log_level_layout.addStretch()
+
+        layout.addLayout(log_level_layout)
+        
+        parent_layout.addWidget(card)
+        
+    def create_status_card(self, parent_layout):
+        """Create Material Design status card"""
+        card = QGroupBox("ℹ️ Статус службы")
+        card.setProperty("elevation", "1")
+        card.setStyleSheet(StyleUtils.get_card_style())
+        
+        layout = QGridLayout(card)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(16)
         
         # Service status
-        service_status_label = QLabel("Служба:")
-        service_status_label.setStyleSheet(self.get_label_style())
+        status_label = QLabel("Статус службы:")
+        status_label.setStyleSheet(StyleUtils.get_label_style_material())
         
-        self.service_status = QLabel("Неизвестно")
-        self.service_status.setProperty("status", "warning")
-        self.service_status.setStyleSheet(self.get_status_style("warning"))
+        self.service_status_label = QLabel("Неизвестно")
+        self.service_status_label.setStyleSheet(StyleUtils.get_status_style_material("unknown"))
         
-        status_grid.addWidget(service_status_label, 0, 0)
-        status_grid.addWidget(self.service_status, 0, 1)
+        layout.addWidget(status_label, 0, 0)
+        layout.addWidget(self.service_status_label, 0, 1)
         
-        # Filter status
-        filter_status_label = QLabel("Фильтр:")
-        filter_status_label.setStyleSheet(self.get_label_style())
+        # Packets filtered
+        packets_label = QLabel("Отфильтровано пакетов:")
+        packets_label.setStyleSheet(StyleUtils.get_label_style_material())
         
-        self.filter_status = QLabel("Неактивен")
-        self.filter_status.setProperty("status", "error")
-        self.filter_status.setStyleSheet(self.get_status_style("error"))
+        self.packets_filtered_label = QLabel("0")
+        self.packets_filtered_label.setStyleSheet(StyleUtils.get_label_style_material(color="#8ab4f8"))
+        self.packets_filtered = 0
         
-        status_grid.addWidget(filter_status_label, 1, 0)
-        status_grid.addWidget(self.filter_status, 1, 1)
+        layout.addWidget(packets_label, 1, 0)
+        layout.addWidget(self.packets_filtered_label, 1, 1)
         
-        # Active profile
-        active_profile_label = QLabel("Активный профиль:")
-        active_profile_label.setStyleSheet(self.get_label_style())
-        
-        self.active_profile = QLabel("Нет")
-        self.active_profile.setStyleSheet(self.get_label_style("#666666", "500"))
-        
-        status_grid.addWidget(active_profile_label, 2, 0)
-        status_grid.addWidget(self.active_profile, 2, 1)
-        
-        layout.addLayout(status_grid)
-        
-        # Progress bar for operations
+        # Progress bar
         self.progress_bar = QProgressBar()
         self.progress_bar.setVisible(False)
-        self.progress_bar.setStyleSheet("""
-            QProgressBar {
-                background-color: #f5f5f5;
-                border: none;
-                border-radius: 8px;
-                text-align: center;
-                color: #1c1b1f;
-                font-weight: 500;
-                height: 8px;
-            }
-            QProgressBar::chunk {
-                background-color: #1976d2;
-                border-radius: 8px;
-            }
-        """)
-        layout.addWidget(self.progress_bar)
+        self.progress_bar.setStyleSheet(StyleUtils.get_progress_bar_style())
+        layout.addWidget(self.progress_bar, 2, 0, 1, 2)
         
         parent_layout.addWidget(card)
         
     def create_actions_card(self, parent_layout):
         """Create Material Design actions card"""
-        card = QGroupBox("🎯 Действия")
+        card = QGroupBox("🚀 Действия")
         card.setProperty("elevation", "1")
-        card.setStyleSheet(self.get_card_style())
+        card.setStyleSheet(StyleUtils.get_card_style())
         
         layout = QHBoxLayout(card)
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(16)
         
-        # Action buttons
-        self.start_button = QPushButton("▶️ Запустить")
-        self.start_button.setProperty("type", "success")
-        self.start_button.setStyleSheet(self.get_button_style("success"))
+        # Buttons
+        self.start_button = QPushButton("🚀 Запустить")
+        self.start_button.setStyleSheet(StyleUtils.get_button_style_material("success"))
+        self.start_button.clicked.connect(self.start_filter)
         
-        self.stop_button = QPushButton("⏹️ Остановить")
-        self.stop_button.setProperty("type", "danger")
-        self.stop_button.setStyleSheet(self.get_button_style("danger"))
+        self.stop_button = QPushButton("⛔️ Остановить")
+        self.stop_button.setStyleSheet(StyleUtils.get_button_style_material("danger"))
+        self.stop_button.clicked.connect(self.stop_filter)
         
-        self.restart_button = QPushButton("🔄 Перезапустить")
-        self.restart_button.setProperty("type", "secondary")
-        self.restart_button.setStyleSheet(self.get_button_style("secondary"))
-        
-        self.apply_button = QPushButton("💾 Применить настройки")
-        self.apply_button.setProperty("type", "secondary")
-        self.apply_button.setStyleSheet(self.get_button_style("secondary"))
+        self.apply_button = QPushButton("⚙️ Применить")
+        self.apply_button.setStyleSheet(StyleUtils.get_button_style_material("secondary"))
+        self.apply_button.clicked.connect(self.apply_settings)
         
         layout.addWidget(self.start_button)
         layout.addWidget(self.stop_button)
-        layout.addWidget(self.restart_button)
         layout.addWidget(self.apply_button)
-        layout.addStretch()
         
         parent_layout.addWidget(card)
         
-        # Connect signals
-        self.start_button.clicked.connect(self.start_filter)
-        self.stop_button.clicked.connect(self.stop_filter)
-        self.restart_button.clicked.connect(self.restart_filter)
-        self.apply_button.clicked.connect(self.apply_settings)
-        self.profile_combo.currentTextChanged.connect(self.on_profile_changed)
-        
-        # Start status update timer
-        self.status_timer = QTimer()
-        self.status_timer.timeout.connect(self.update_status)
-        self.status_timer.start(5000)  # Update every 5 seconds
-        
-        # Initial status update
-        self.update_status()
-        
     def load_profiles(self):
-        """Load available filter profiles"""
+        """Load filtration profiles from JSON"""
         try:
             bat_files = self.file_manager.get_bat_files()
             profiles = []
@@ -497,37 +448,20 @@ class FilterTab(QWidget):
         """Update status display based on service status"""
         # Update service status
         if "работает" in service_status.lower() or "running" in service_status.lower():
-            self.service_status.setText("Запущена")
-            self.service_status.setProperty("status", "success")
-            self.service_status.setStyleSheet(self.get_status_style("success"))
+            self.service_status_label.setText("Запущена")
+            self.service_status_label.setStyleSheet(StyleUtils.get_status_style_material("success"))
         elif "остановлена" in service_status.lower() or "stopped" in service_status.lower():
-            self.service_status.setText("Остановлена")
-            self.service_status.setProperty("status", "error")
-            self.service_status.setStyleSheet(self.get_status_style("error"))
+            self.service_status_label.setText("Остановлена")
+            self.service_status_label.setStyleSheet(StyleUtils.get_status_style_material("error"))
         elif "не установлена" in service_status.lower():
-            self.service_status.setText("Не установлена")
-            self.service_status.setProperty("status", "warning")
-            self.service_status.setStyleSheet(self.get_status_style("warning"))
+            self.service_status_label.setText("Не установлена")
+            self.service_status_label.setStyleSheet(StyleUtils.get_status_style_material("warning"))
         else:
-            self.service_status.setText("Неизвестно")
-            self.service_status.setProperty("status", "warning")
-            self.service_status.setStyleSheet(self.get_status_style("warning"))
+            self.service_status_label.setText("Неизвестно")
+            self.service_status_label.setStyleSheet(StyleUtils.get_status_style_material("warning"))
         
-        # Update filter status
-        if "работает" in service_status.lower() or "running" in service_status.lower():
-            self.filter_status.setText("Активен")
-            self.filter_status.setProperty("status", "success")
-            self.filter_status.setStyleSheet(self.get_status_style("success"))
-        else:
-            self.filter_status.setText("Неактивен")
-            self.filter_status.setProperty("status", "error")
-            self.filter_status.setStyleSheet(self.get_status_style("error"))
-        
-        # Update active profile
-        if ("работает" in service_status.lower() or "running" in service_status.lower()) and self.profile_combo.currentText():
-            self.active_profile.setText(self.profile_combo.currentText())
-        else:
-            self.active_profile.setText("Нет")
+        # Update packets filtered
+        self.packets_filtered_label.setText(str(self.packets_filtered))
     
     def check_service_status(self):
         """Проверяет статус службы Windows"""
@@ -577,7 +511,6 @@ class FilterTab(QWidget):
         self.is_operation_in_progress = in_progress
         self.start_button.setEnabled(not in_progress)
         self.stop_button.setEnabled(not in_progress)
-        self.restart_button.setEnabled(not in_progress)
         self.apply_button.setEnabled(not in_progress)
         self.profile_combo.setEnabled(not in_progress)
         

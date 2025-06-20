@@ -248,11 +248,11 @@ class StyleUtils:
                     color: #888888;
                 }
             """,
-            "secondary": """
+            "warning": """
                 QPushButton {
-                    background-color: transparent;
-                    color: #0078d4;
-                    border: 1px solid #0078d4;
+                    background-color: #ff9800;
+                    color: #ffffff;
+                    border: none;
                     border-radius: 20px;
                     padding: 12px 24px;
                     font-weight: 500;
@@ -262,13 +262,11 @@ class StyleUtils:
                     font-family: 'Segoe UI', Arial, sans-serif;
                 }
                 QPushButton:hover {
-                    background-color: #0078d4;
-                    color: #ffffff;
+                    background-color: #e68900;
                 }
                 QPushButton:disabled {
-                    background-color: #2d2d2d;
-                    color: #666666;
-                    border-color: #404040;
+                    background-color: #666666;
+                    color: #888888;
                 }
             """,
             "info": """
@@ -285,7 +283,28 @@ class StyleUtils:
                     font-family: 'Segoe UI', Arial, sans-serif;
                 }
                 QPushButton:hover {
-                    background-color: #1976d2;
+                    background-color: #1e88e5;
+                }
+                QPushButton:disabled {
+                    background-color: #666666;
+                    color: #888888;
+                }
+            """,
+            "secondary": """
+                QPushButton {
+                    background-color: #404040;
+                    color: #ffffff;
+                    border: none;
+                    border-radius: 20px;
+                    padding: 12px 24px;
+                    font-weight: 500;
+                    font-size: 14px;
+                    min-height: 40px;
+                    min-width: 120px;
+                    font-family: 'Segoe UI', Arial, sans-serif;
+                }
+                QPushButton:hover {
+                    background-color: #505050;
                 }
                 QPushButton:disabled {
                     background-color: #666666;
@@ -298,21 +317,21 @@ class StyleUtils:
     @staticmethod
     def get_status_style_material(status_type):
         """Get status label style based on status type for Dark Theme"""
-        colors = {
-            "success": "#4caf50",
-            "error": "#f44336", 
-            "warning": "#ff9800",
-            "info": "#2196f3"
+        styles = {
+            "enabled": """
+                color: #81c995;
+                font-weight: 500;
+            """,
+            "disabled": """
+                color: #f7a299;
+                font-weight: 500;
+            """,
+            "unknown": """
+                color: #9aa0a6;
+                font-weight: 500;
+            """
         }
-        color = colors.get(status_type, "#ffffff")
-        return f"""
-            QLabel {{
-                color: {color};
-                font-weight: 600;
-                font-size: 14px;
-                font-family: 'Segoe UI', Arial, sans-serif;
-            }}
-        """
+        return styles.get(status_type, styles["unknown"])
     
     @staticmethod
     def get_text_edit_style():
@@ -322,10 +341,10 @@ class StyleUtils:
                 background-color: #1e1e1e;
                 color: #ffffff;
                 border: 1px solid #404040;
-                border-radius: 4px;
-                padding: 8px;
-                font-size: 10pt;
-                font-family: 'Segoe UI', Arial, sans-serif;
+                border-radius: 8px;
+                padding: 12px;
+                font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+                font-size: 11pt;
             }
         """
     
@@ -334,18 +353,16 @@ class StyleUtils:
         """Get common progress bar style"""
         return """
             QProgressBar {
-                background-color: #1e1e1e;
-                border: none;
-                border-radius: 8px;
+                border: 1px solid #404040;
+                border-radius: 4px;
+                background-color: #2d2d2d;
                 text-align: center;
                 color: #ffffff;
                 font-weight: 500;
-                height: 8px;
-                font-family: 'Segoe UI', Arial, sans-serif;
             }
             QProgressBar::chunk {
                 background-color: #0078d4;
-                border-radius: 8px;
+                border-radius: 3px;
             }
         """
     
@@ -357,53 +374,39 @@ class StyleUtils:
                 background-color: #1e1e1e;
                 color: #ffffff;
                 border: 1px solid #404040;
+                border-radius: 8px;
                 gridline-color: #404040;
-                font-family: 'Segoe UI', Arial, sans-serif;
-            }
-            QTableWidget::item {
-                padding: 8px;
-                border: none;
-            }
-            QTableWidget::item:selected {
-                background-color: #0078d4;
-                color: #ffffff;
             }
             QHeaderView::section {
                 background-color: #2d2d2d;
                 color: #ffffff;
-                padding: 8px;
+                padding: 10px;
                 border: 1px solid #404040;
-                font-weight: bold;
-                font-family: 'Segoe UI', Arial, sans-serif;
+                font-weight: 500;
             }
-            QHeaderView::section:hover {
-                background-color: #404040;
+            QTableWidget::item {
+                padding: 10px;
             }
         """
     
     @staticmethod
     def get_list_style():
-        """Get common list style"""
+        """Get common list view style"""
         return """
-            QListWidget {
+            QListView {
                 background-color: #1e1e1e;
                 color: #ffffff;
                 border: 1px solid #404040;
-                border-radius: 4px;
-                padding: 4px;
-                font-family: 'Segoe UI', Arial, sans-serif;
+                border-radius: 8px;
             }
-            QListWidget::item {
-                padding: 8px;
-                border-radius: 4px;
-                margin: 2px;
+            QListView::item {
+                padding: 10px;
             }
-            QListWidget::item:hover {
-                background-color: #404040;
+            QListView::item:hover {
+                background-color: #2d2d2d;
             }
-            QListWidget::item:selected {
+            QListView::item:selected {
                 background-color: #0078d4;
-                color: #ffffff;
             }
         """
     
@@ -412,26 +415,25 @@ class StyleUtils:
         """Get common checkbox style"""
         return """
             QCheckBox {
+                font-size: 14px;
                 color: #ffffff;
+                spacing: 12px;
                 font-family: 'Segoe UI', Arial, sans-serif;
-                spacing: 8px;
             }
             QCheckBox::indicator {
-                width: 16px;
-                height: 16px;
-                border: 2px solid #404040;
-                border-radius: 3px;
+                width: 20px;
+                height: 20px;
+                border: 2px solid #505050;
+                border-radius: 6px;
                 background-color: #2d2d2d;
             }
             QCheckBox::indicator:checked {
                 background-color: #0078d4;
                 border-color: #0078d4;
+                image: url(check.svg);
             }
-            QCheckBox::indicator:checked::after {
-                content: "✓";
-                color: #ffffff;
-                font-weight: bold;
-                font-size: 12px;
+            QCheckBox::indicator:hover {
+                border-color: #0078d4;
             }
         """
     
@@ -441,20 +443,17 @@ class StyleUtils:
         return """
             QSpinBox {
                 background-color: #2d2d2d;
-                border: 1px solid #404040;
-                border-radius: 4px;
-                padding: 6px;
                 color: #ffffff;
-                font-family: 'Segoe UI', Arial, sans-serif;
+                border: 1px solid #404040;
+                border-radius: 8px;
+                padding: 10px;
+                font-size: 14px;
             }
             QSpinBox::up-button, QSpinBox::down-button {
-                background-color: #404040;
+                subcontrol-origin: border;
+                subcontrol-position: right;
+                width: 20px;
                 border: none;
-                border-radius: 2px;
-                width: 16px;
-            }
-            QSpinBox::up-button:hover, QSpinBox::down-button:hover {
-                background-color: #505050;
             }
             QSpinBox::up-arrow {
                 image: none;
@@ -467,5 +466,86 @@ class StyleUtils:
                 border-left: 4px solid transparent;
                 border-right: 4px solid transparent;
                 border-top: 4px solid #ffffff;
+            }
+            QSpinBox::up-arrow:hover, QSpinBox::down-arrow:hover {
+                background-color: #505050;
+            }
+        """
+    
+    @staticmethod
+    def get_tab_widget_style():
+        """Get common tab widget style"""
+        return """
+            QTabWidget::pane {
+                border: 1px solid #404040;
+                border-radius: 6px;
+                background-color: #1e1e1e;
+            }
+            QTabBar::tab {
+                background-color: #2d2d2d;
+                color: #ffffff;
+                padding: 12px 20px;
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+                border: 1px solid #404040;
+                border-bottom: none;
+                margin-right: 2px;
+                font-weight: 500;
+                font-size: 14px;
+            }
+            QTabBar::tab:selected {
+                background-color: #1e1e1e;
+                border-bottom: 2px solid #0078d4;
+            }
+            QTabBar::tab:hover {
+                background-color: #404040;
+            }
+        """
+    
+    @staticmethod
+    def get_list_widget_style():
+        """Get common list widget style"""
+        return """
+            QListWidget {
+                background-color: #1e1e1e;
+                border: 1px solid #404040;
+                border-radius: 6px;
+                padding: 8px;
+                font-size: 11pt;
+                color: #ffffff;
+            }
+            QListWidget::item {
+                padding: 8px;
+                border-radius: 4px;
+                margin: 2px;
+            }
+            QListWidget::item:hover {
+                background-color: #2d2d2d;
+            }
+            QListWidget::item:selected {
+                background-color: #0078d4;
+                color: #ffffff;
+            }
+        """
+
+    @staticmethod
+    def get_menu_style():
+        """Get common menu style"""
+        return """
+            QMenu {
+                background-color: #2d2d2d;
+                border: 1px solid #404040;
+                border-radius: 6px;
+                padding: 5px;
+                color: #ffffff;
+            }
+            QMenu::item {
+                padding: 10px 20px;
+                border-radius: 4px;
+                margin: 2px;
+            }
+            QMenu::item:selected {
+                background-color: #0078d4;
+                color: #ffffff;
             }
         """ 

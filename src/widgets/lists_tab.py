@@ -31,8 +31,8 @@ class StatCard(QFrame):
         """Инициализирует интерфейс карточки."""
         self.setStyleSheet("""
             QFrame {
-                background-color: white;
-                border: 1px solid #e1e1e1;
+                background-color: #2d2d2d;
+                border: 1px solid #404040;
                 border-radius: 8px;
                 padding: 12px;
             }
@@ -42,21 +42,16 @@ class StatCard(QFrame):
         layout.setSpacing(8)
         
         title_label = QLabel(title)
-        title_label.setStyleSheet("""
-            QLabel {
-                font-size: 10pt;
-                color: #666666;
-                font-weight: normal;
-            }
-        """)
+        title_label.setStyleSheet(StyleUtils.get_label_style_material(color="#cccccc"))
         
         self.value_label = QLabel(value)
-        self.value_label.setStyleSheet("""
-            QLabel {
-                font-size: 16pt;
+        self.value_label.setStyleSheet(f"""
+            QLabel {{
+                color: #8ab4f8;
                 font-weight: bold;
-                color: #1976d2;
-            }
+                font-size: 16pt;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            }}
         """)
         
         layout.addWidget(title_label)
@@ -134,13 +129,14 @@ class ListsTab(QWidget):
         
         # Заголовок
         title_label = QLabel("📋 Управление списками доменов")
-        title_label.setStyleSheet("""
-            QLabel {
+        title_label.setStyleSheet(f"""
+            QLabel {{
                 font-size: 24px;
                 font-weight: bold;
-                color: #1c1b1f;
+                color: #ffffff;
                 margin-bottom: 10px;
-            }
+                font-family: 'Segoe UI', Arial, sans-serif;
+            }}
         """)
         main_layout.addWidget(title_label)
         
@@ -164,8 +160,8 @@ class ListsTab(QWidget):
         panel = QFrame()
         panel.setStyleSheet("""
             QFrame {
-                background-color: #f8f9fa;
-                border: 1px solid #e1e1e1;
+                background-color: #2d2d2d;
+                border: 1px solid #404040;
                 border-radius: 8px;
                 padding: 10px;
             }
@@ -186,13 +182,12 @@ class ListsTab(QWidget):
         self.files_list.setMinimumHeight(200)
         self.files_list.setStyleSheet("""
             QListWidget {
-                background-color: white;
-                border: 1px solid #dee2e6;
+                background-color: #1e1e1e;
+                border: 1px solid #404040;
                 border-radius: 6px;
                 padding: 8px;
                 font-size: 11pt;
-                selection-background-color: #e3f2fd;
-                selection-color: #1976d2;
+                color: #ffffff;
             }
             QListWidget::item {
                 padding: 8px;
@@ -200,11 +195,11 @@ class ListsTab(QWidget):
                 margin: 2px;
             }
             QListWidget::item:hover {
-                background-color: #f5f5f5;
+                background-color: #2d2d2d;
             }
             QListWidget::item:selected {
-                background-color: #e3f2fd;
-                color: #1976d2;
+                background-color: #0078d4;
+                color: #ffffff;
             }
         """)
         files_layout.addWidget(self.files_list)
@@ -217,33 +212,17 @@ class ListsTab(QWidget):
         self.files_menu_btn = QToolButton()
         self.files_menu_btn.setText("📁 Действия с файлами")
         self.files_menu_btn.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
-        self.files_menu_btn.setStyleSheet("""
-            QToolButton {
-                background-color: #1976d2;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 10px 16px;
-                font-weight: bold;
-                font-size: 10pt;
-                min-height: 40px;
-            }
-            QToolButton:hover {
-                background-color: #1565c0;
-            }
-            QToolButton:pressed {
-                background-color: #0d47a1;
-            }
-        """)
+        self.files_menu_btn.setStyleSheet(StyleUtils.get_button_style_material("info"))
         
         # Создаем меню файлов
         self.files_menu = QMenu()
         self.files_menu.setStyleSheet("""
             QMenu {
-                background-color: white;
-                border: 1px solid #e1e1e1;
+                background-color: #2d2d2d;
+                border: 1px solid #404040;
                 border-radius: 6px;
                 padding: 5px;
+                color: #ffffff;
             }
             QMenu::item {
                 padding: 10px 20px;
@@ -251,8 +230,8 @@ class ListsTab(QWidget):
                 margin: 2px;
             }
             QMenu::item:selected {
-                background-color: #e3f2fd;
-                color: #1976d2;
+                background-color: #0078d4;
+                color: #ffffff;
             }
         """)
         
@@ -261,7 +240,6 @@ class ListsTab(QWidget):
             ("🔄 Обновить список", self.refresh_files),
             ("➕ Добавить файл", self.add_file),
             ("🗑️ Удалить файл", self.delete_file),
-            ("📊 Обновить статистику", self.update_stats)
         ]
         
         for text, action in file_actions:
@@ -287,11 +265,12 @@ class ListsTab(QWidget):
             QLabel {
                 font-size: 12pt;
                 font-weight: bold;
-                color: #666666;
+                color: #cccccc;
                 padding: 8px;
-                background-color: #f5f5f5;
+                background-color: #3c3c3c;
                 border-radius: 6px;
-                border: 1px solid #e0e0e0;
+                border: 1px solid #505050;
+                font-family: 'Segoe UI', Arial, sans-serif;
             }
         """)
         ipset_layout.addWidget(self.ipset_status_label)
@@ -301,14 +280,12 @@ class ListsTab(QWidget):
         ipset_btn_layout.setSpacing(10)
         
         self.ipset_toggle_btn = QPushButton("Включить")
-        self.ipset_toggle_btn.setStyleSheet(StyleUtils.get_button_style("primary"))
+        self.ipset_toggle_btn.setStyleSheet(StyleUtils.get_button_style_material("primary"))
         self.ipset_toggle_btn.setMinimumHeight(40)
-        self.ipset_toggle_btn.setFont(QFont("Segoe UI", 10, QFont.Weight.Medium))
         
         self.ipset_update_btn = QPushButton("🔄 Обновить")
-        self.ipset_update_btn.setStyleSheet(StyleUtils.get_button_style("secondary"))
+        self.ipset_update_btn.setStyleSheet(StyleUtils.get_button_style_material("secondary"))
         self.ipset_update_btn.setMinimumHeight(40)
-        self.ipset_update_btn.setFont(QFont("Segoe UI", 10, QFont.Weight.Medium))
         
         ipset_btn_layout.addWidget(self.ipset_toggle_btn)
         ipset_btn_layout.addWidget(self.ipset_update_btn)
@@ -323,13 +300,7 @@ class ListsTab(QWidget):
         
         # Статус обновления
         self.ipset_status_text = QLabel("")
-        self.ipset_status_text.setStyleSheet("""
-            QLabel {
-                font-size: 10pt;
-                color: #666666;
-                padding: 4px;
-            }
-        """)
+        self.ipset_status_text.setStyleSheet(StyleUtils.get_label_style_material(color="#cccccc"))
         self.ipset_status_text.setVisible(False)
         ipset_layout.addWidget(self.ipset_status_text)
         
@@ -362,8 +333,8 @@ class ListsTab(QWidget):
         panel = QFrame()
         panel.setStyleSheet("""
             QFrame {
-                background-color: white;
-                border: 1px solid #e1e1e1;
+                background-color: #2d2d2d;
+                border: 1px solid #404040;
                 border-radius: 8px;
             }
         """)
@@ -374,30 +345,20 @@ class ListsTab(QWidget):
         
         # Заголовок области редактирования
         content_header = QLabel("📝 Редактор файла")
-        content_header.setStyleSheet("""
-            QLabel {
+        content_header.setStyleSheet(f"""
+            QLabel {{
                 font-size: 16px;
                 font-weight: bold;
-                color: #1c1b1f;
+                color: #ffffff;
                 padding: 5px 0;
-            }
+                font-family: 'Segoe UI', Arial, sans-serif;
+            }}
         """)
         layout.addWidget(content_header)
         
         # Область редактирования
         self.content_text = QTextEdit()
-        self.content_text.setStyleSheet("""
-            QTextEdit {
-                background-color: #f8f9fa;
-                color: #333333;
-                border: 1px solid #dee2e6;
-                border-radius: 6px;
-                padding: 12px;
-                font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-                font-size: 11pt;
-                line-height: 1.4;
-            }
-        """)
+        self.content_text.setStyleSheet(StyleUtils.get_text_edit_style())
         self.content_text.setWordWrapMode(QTextOption.WrapMode.WrapAnywhere)
         layout.addWidget(self.content_text)
         
@@ -406,15 +367,13 @@ class ListsTab(QWidget):
         edit_btn_layout.setSpacing(10)
         
         self.save_btn = QPushButton("💾 Сохранить")
-        self.save_btn.setStyleSheet(StyleUtils.get_button_style("success"))
+        self.save_btn.setStyleSheet(StyleUtils.get_button_style_material("success"))
         self.save_btn.setMinimumHeight(40)
-        self.save_btn.setFont(QFont("Segoe UI", 10, QFont.Weight.Medium))
         self.save_btn.setEnabled(False)
         
         self.clear_btn = QPushButton("🗑️ Очистить")
         self.clear_btn.setStyleSheet(StyleUtils.get_button_style("warning"))
         self.clear_btn.setMinimumHeight(40)
-        self.clear_btn.setFont(QFont("Segoe UI", 10, QFont.Weight.Medium))
         
         edit_btn_layout.addStretch()
         edit_btn_layout.addWidget(self.clear_btn)
@@ -466,7 +425,6 @@ class ListsTab(QWidget):
             self.files_list.addItems(files)
         except FileNotFoundError:
             QMessageBox.warning(self, "⚠️ Ошибка", "Папка со списками не найдена.")
-        self.update_stats()
 
     def display_file_content(self, current, previous):
         """Отображает содержимое выбранного файла."""
@@ -551,30 +509,32 @@ class ListsTab(QWidget):
                 QLabel {
                     font-size: 12pt;
                     font-weight: bold;
-                    color: #4caf50;
+                    color: #81c995;
                     padding: 8px;
-                    background-color: #e8f5e8;
+                    background-color: rgba(129, 201, 149, 0.1);
                     border-radius: 6px;
-                    border: 1px solid #c8e6c9;
+                    border: 1px solid #81c995;
+                    font-family: 'Segoe UI', Arial, sans-serif;
                 }
             """)
             self.ipset_toggle_btn.setText("Выключить")
-            self.ipset_toggle_btn.setStyleSheet(StyleUtils.get_button_style("danger"))
+            self.ipset_toggle_btn.setStyleSheet(StyleUtils.get_button_style_material("danger"))
         else:
             self.ipset_status_label.setText("Статус: Выключен")
             self.ipset_status_label.setStyleSheet("""
                 QLabel {
                     font-size: 12pt;
                     font-weight: bold;
-                    color: #666666;
+                    color: #cccccc;
                     padding: 8px;
-                    background-color: #f5f5f5;
+                    background-color: #3c3c3c;
                     border-radius: 6px;
-                    border: 1px solid #e0e0e0;
+                    border: 1px solid #505050;
+                    font-family: 'Segoe UI', Arial, sans-serif;
                 }
             """)
             self.ipset_toggle_btn.setText("Включить")
-            self.ipset_toggle_btn.setStyleSheet(StyleUtils.get_button_style("primary"))
+            self.ipset_toggle_btn.setStyleSheet(StyleUtils.get_button_style_material("primary"))
 
     def toggle_ipset_mode(self):
         """Переключает режим Ipset."""
@@ -635,6 +595,9 @@ class ListsTab(QWidget):
 
     def update_stats(self):
         """Обновляет статистику по файлам."""
+        if not hasattr(self, 'file_count_card') or not hasattr(self, 'total_size_card') or not hasattr(self, 'domain_count_card'):
+            return
+
         try:
             total_size = 0
             total_domains = 0

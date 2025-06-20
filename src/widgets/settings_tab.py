@@ -50,14 +50,9 @@ class SettingsTab(QWidget):
         
         # Заголовок
         title_label = QLabel("⚙️ Настройки приложения")
-        title_label.setStyleSheet("""
-            QLabel {
-                font-size: 24px;
-                font-weight: bold;
-                color: #1c1b1f;
-                margin-bottom: 10px;
-            }
-        """)
+        title_label.setStyleSheet(StyleUtils.get_label_style_material(weight="bold", color="#ffffff"))
+        title_label.setFont(QFont("Segoe UI", 24, QFont.Weight.Bold))
+
         main_layout.addWidget(title_label)
         
         # Создаем сплиттер для лучшей организации
@@ -80,8 +75,8 @@ class SettingsTab(QWidget):
         panel = QFrame()
         panel.setStyleSheet("""
             QFrame {
-                background-color: #f8f9fa;
-                border: 1px solid #e1e1e1;
+                background-color: #2d2d2d;
+                border: 1px solid #404040;
                 border-radius: 8px;
                 padding: 10px;
             }
@@ -99,37 +94,11 @@ class SettingsTab(QWidget):
         theme_layout.setHorizontalSpacing(15)
         
         theme_label = QLabel("Тема интерфейса:")
-        theme_label.setStyleSheet("""
-            QLabel {
-                font-size: 11pt;
-                font-weight: bold;
-                color: #333333;
-            }
-        """)
+        theme_label.setStyleSheet(StyleUtils.get_label_style_material())
         
         self.theme_combo = QComboBox()
-        self.theme_combo.addItems(["Темная", "Светлая", "Material Dark", "Material Light"])
-        self.theme_combo.setStyleSheet("""
-            QComboBox {
-                background-color: white;
-                border: 1px solid #dee2e6;
-                border-radius: 6px;
-                padding: 8px 12px;
-                font-size: 11pt;
-                min-height: 35px;
-            }
-            QComboBox::drop-down {
-                border: none;
-                width: 20px;
-            }
-            QComboBox::down-arrow {
-                image: none;
-                border-left: 5px solid transparent;
-                border-right: 5px solid transparent;
-                border-top: 5px solid #666666;
-                margin-right: 10px;
-            }
-        """)
+        self.theme_combo.addItems(["Темная"])
+        self.theme_combo.setStyleSheet(StyleUtils.get_combo_style())
         
         theme_layout.addWidget(theme_label, 0, 0)
         theme_layout.addWidget(self.theme_combo, 0, 1)
@@ -141,29 +110,10 @@ class SettingsTab(QWidget):
         update_layout.setSpacing(15)
         
         self.auto_update_checkbox = QCheckBox("Проверять обновления при запуске")
-        self.auto_update_checkbox.setStyleSheet("""
-            QCheckBox {
-                font-size: 11pt;
-                color: #333333;
-                spacing: 8px;
-            }
-            QCheckBox::indicator {
-                width: 18px;
-                height: 18px;
-                border: 2px solid #dee2e6;
-                border-radius: 4px;
-                background-color: white;
-            }
-            QCheckBox::indicator:checked {
-                background-color: #1976d2;
-                border-color: #1976d2;
-            }
-        """)
+        self.auto_update_checkbox.setStyleSheet(StyleUtils.get_checkbox_style())
         
         self.check_update_btn = QPushButton("🔍 Проверить обновления")
-        self.check_update_btn.setStyleSheet(StyleUtils.get_button_style("secondary"))
-        self.check_update_btn.setMinimumHeight(40)
-        self.check_update_btn.setFont(QFont("Segoe UI", 10, QFont.Weight.Medium))
+        self.check_update_btn.setStyleSheet(StyleUtils.get_button_style_material("secondary"))
         
         update_layout.addWidget(self.auto_update_checkbox)
         update_layout.addWidget(self.check_update_btn)
@@ -175,44 +125,10 @@ class SettingsTab(QWidget):
         app_layout.setSpacing(15)
         
         self.startup_checkbox = QCheckBox("Запускать при запуске Windows")
-        self.startup_checkbox.setStyleSheet("""
-            QCheckBox {
-                font-size: 11pt;
-                color: #333333;
-                spacing: 8px;
-            }
-            QCheckBox::indicator {
-                width: 18px;
-                height: 18px;
-                border: 2px solid #dee2e6;
-                border-radius: 4px;
-                background-color: white;
-            }
-            QCheckBox::indicator:checked {
-                background-color: #1976d2;
-                border-color: #1976d2;
-            }
-        """)
+        self.startup_checkbox.setStyleSheet(StyleUtils.get_checkbox_style())
         
         self.minimize_checkbox = QCheckBox("Сворачивать в трей при закрытии")
-        self.minimize_checkbox.setStyleSheet("""
-            QCheckBox {
-                font-size: 11pt;
-                color: #333333;
-                spacing: 8px;
-            }
-            QCheckBox::indicator {
-                width: 18px;
-                height: 18px;
-                border: 2px solid #dee2e6;
-                border-radius: 4px;
-                background-color: white;
-            }
-            QCheckBox::indicator:checked {
-                background-color: #1976d2;
-                border-color: #1976d2;
-            }
-        """)
+        self.minimize_checkbox.setStyleSheet(StyleUtils.get_checkbox_style())
         
         app_layout.addWidget(self.startup_checkbox)
         app_layout.addWidget(self.minimize_checkbox)
@@ -230,8 +146,8 @@ class SettingsTab(QWidget):
         panel = QFrame()
         panel.setStyleSheet("""
             QFrame {
-                background-color: white;
-                border: 1px solid #e1e1e1;
+                background-color: #2d2d2d;
+                border: 1px solid #404040;
                 border-radius: 8px;
             }
         """)
@@ -242,59 +158,33 @@ class SettingsTab(QWidget):
         
         # Заголовок действий
         actions_header = QLabel("🎮 Действия")
-        actions_header.setStyleSheet("""
-            QLabel {
-                font-size: 16px;
-                font-weight: bold;
-                color: #1c1b1f;
-                padding: 5px 0;
-            }
-        """)
+        actions_header.setStyleSheet(StyleUtils.get_label_style_material(weight="bold"))
+        
         layout.addWidget(actions_header)
         
         # Кнопки управления
         self.save_btn = QPushButton("💾 Сохранить настройки")
-        self.save_btn.setStyleSheet(StyleUtils.get_button_style("success"))
-        self.save_btn.setMinimumHeight(45)
-        self.save_btn.setFont(QFont("Segoe UI", 11, QFont.Weight.Bold))
+        self.save_btn.setStyleSheet(StyleUtils.get_button_style_material("success"))
         self.save_btn.setEnabled(False)
         
         self.reset_btn = QPushButton("🔄 Сбросить настройки")
-        self.reset_btn.setStyleSheet(StyleUtils.get_button_style("warning"))
-        self.reset_btn.setMinimumHeight(45)
-        self.reset_btn.setFont(QFont("Segoe UI", 11, QFont.Weight.Bold))
+        self.reset_btn.setStyleSheet(StyleUtils.get_button_style_material("warning"))
         
         # Создаем выпадающее меню для дополнительных действий
         self.actions_menu_btn = QToolButton()
         self.actions_menu_btn.setText("📋 Дополнительные действия")
         self.actions_menu_btn.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
-        self.actions_menu_btn.setStyleSheet("""
-            QToolButton {
-                background-color: #1976d2;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 10px 16px;
-                font-weight: bold;
-                font-size: 10pt;
-                min-height: 40px;
-            }
-            QToolButton:hover {
-                background-color: #1565c0;
-            }
-            QToolButton:pressed {
-                background-color: #0d47a1;
-            }
-        """)
+        self.actions_menu_btn.setStyleSheet(StyleUtils.get_button_style_material("info"))
         
         # Создаем меню действий
         self.actions_menu = QMenu()
         self.actions_menu.setStyleSheet("""
             QMenu {
-                background-color: white;
-                border: 1px solid #e1e1e1;
+                background-color: #2d2d2d;
+                border: 1px solid #404040;
                 border-radius: 6px;
                 padding: 5px;
+                color: #ffffff;
             }
             QMenu::item {
                 padding: 10px 20px;
@@ -302,8 +192,8 @@ class SettingsTab(QWidget):
                 margin: 2px;
             }
             QMenu::item:selected {
-                background-color: #e3f2fd;
-                color: #1976d2;
+                background-color: #0078d4;
+                color: #ffffff;
             }
         """)
         
@@ -334,13 +224,7 @@ class SettingsTab(QWidget):
         • Настройки сохраняются автоматически<br>
         • Используйте экспорт для резервных копий
         """)
-        info_text.setStyleSheet("""
-            QLabel {
-                font-size: 10pt;
-                color: #666666;
-                line-height: 1.4;
-            }
-        """)
+        info_text.setStyleSheet(StyleUtils.get_label_style_material(color="#cccccc"))
         info_text.setWordWrap(True)
         info_layout.addWidget(info_text)
         
