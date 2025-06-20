@@ -69,11 +69,6 @@ class ServiceManager:
 
     def install_service(self, bat_file_path):
         """Устанавливает службу, парся аргументы из .bat файла."""
-        # This is a complex parsing logic from the batch file.
-        # For now, let's simplify and assume we can construct the args.
-        # The full parsing logic will be implemented later.
-        
-        # Placeholder for argument parsing
         args = self._parse_bat_file(bat_file_path)
         if not args:
             return False, "Failed to parse .bat file."
@@ -82,9 +77,9 @@ class ServiceManager:
         self.uninstall_service() # Ensure it's not installed first
         
         install_cmd = (
-            f'sc create "{self.service_name}" binPath= "\\"_"{self.winsw_path}"_ {args}\\" '
+            f'sc create "{self.service_name}" binPath= "{self.winsw_path} {args}" '
             f'DisplayName= "{self.service_name}" start= auto'
-        ).replace("_", "") # hack for quotes
+        )
         
         stdout, stderr = self._run_command(install_cmd, as_admin=True)
         if not stdout or "SUCCESS" not in stdout:
